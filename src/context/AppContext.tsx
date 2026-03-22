@@ -14,14 +14,23 @@ interface ModuleMeta {
 const MODULE_META: Record<string, ModuleMeta> = {
   array: { title: 'Array Operations', desc: 'Visualize array operations.' },
   linkedlist: { title: 'Linked List', desc: 'Explore linked list nodes.' },
+  doublylinkedlist: { title: 'Doubly Linked List', desc: 'Nodes with dual pointers.' },
+  circularlinkedlist: { title: 'Circular Linked List', desc: 'Tail loops back to head.' },
   stack: { title: 'Stack', desc: 'LIFO data structure.' },
   queue: { title: 'Queue', desc: 'FIFO data structure.' },
+  deque: { title: 'Deque', desc: 'Double-ended queue.' },
+  circularqueue: { title: 'Circular Queue', desc: 'Ring buffer queue.' },
+  priorityqueue: { title: 'Priority Queue', desc: 'Priority-based ordering.' },
+  binarysearch: { title: 'Binary Search', desc: 'O(log n) search on sorted data.' },
   binarytree: { title: 'Binary Tree', desc: 'Tree traversals & operations.' },
   bst: { title: 'Binary Search Tree', desc: 'Efficient search structure.' },
   heap: { title: 'Heap', desc: 'Priority queue structure.' },
+  trie: { title: 'Trie', desc: 'Prefix tree for strings.' },
   graph: { title: 'Graph', desc: 'Vertices and edges.' },
   hashtable: { title: 'Hash Table', desc: 'O(1) average lookup.' },
   sorting: { title: 'Sorting Algorithms', desc: 'Compare sorting strategies.' },
+  towerofhanoi: { title: 'Tower of Hanoi', desc: 'Classic recursive puzzle.' },
+  recursion: { title: 'Recursion', desc: 'Visualize recursive call stacks.' },
 };
 
 interface AppContextType {
@@ -32,6 +41,8 @@ interface AppContextType {
   setComplexity: (c: string[][]) => void;
   pseudocode: string;
   setPseudocode: (p: string) => void;
+  theory: string;
+  setTheory: (t: string) => void;
   logs: LogEntry[];
   addLog: (msg: string, type?: string) => void;
   speed: number;
@@ -51,6 +62,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activeModule, setActiveModuleRaw] = useState('array');
   const [complexity, setComplexity] = useState<string[][]>([['Access', 'O(1)', 'O(n)']]);
   const [pseudocode, setPseudocode] = useState('');
+  const [theory, setTheory] = useState('');
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [speed, setSpeed] = useState(600);
   const [stepMode, setStepMode] = useState(false);
@@ -87,6 +99,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       activeModule, setActiveModule, meta,
       complexity, setComplexity,
       pseudocode, setPseudocode,
+      theory, setTheory,
       logs, addLog,
       speed, setSpeed,
       stepMode, setStepMode,

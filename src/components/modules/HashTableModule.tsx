@@ -7,7 +7,7 @@ const SIZE = 7;
 const hash = (v: number) => ((v * 31) % SIZE + SIZE) % SIZE;
 
 export default function HashTableModule() {
-  const { speed, addLog, setComplexity, setPseudocode, stepMode, waitForStep } = useApp();
+  const { speed, addLog, setComplexity, setPseudocode, setTheory, stepMode, waitForStep } = useApp();
   const [buckets, setBuckets] = useState<number[][]>(() => {
     const b = Array.from({ length: SIZE }, () => [] as number[]);
     [15, 42, 8, 23, 50, 19, 7].forEach(v => b[hash(v)].push(v)); return b;
@@ -21,7 +21,8 @@ export default function HashTableModule() {
   useEffect(() => {
     setComplexity([['Insert','O(1) avg','O(n)'],['Search','O(1) avg','O(1)'],['Delete','O(1) avg','O(1)']]);
     setPseudocode(`HASH(key) = (key × 31) mod SIZE\n\nINSERT(key):\n  idx = HASH(key)\n  table[idx].append(key)\n\nSEARCH(key):\n  idx = HASH(key)\n  walk chain at table[idx]`);
-  }, [setComplexity, setPseudocode]);
+    setTheory(`## Hash Table — Constant Time Lookup\n\nA **Hash Table** (or Hash Map) is a data structure that maps **keys to values** using a **hash function**. It provides average O(1) time for insertions, deletions, and lookups.\n\n### How It Works\n1. A **hash function** converts the key into an index (bucket number).\n2. The value is stored at that index in an underlying array.\n3. When two keys map to the same index (**collision**), a resolution strategy is used.\n\n### Hash Function\nA good hash function should:\n- Be **deterministic** (same input → same output).\n- **Distribute uniformly** across the bucket range.\n- Be **fast** to compute.\n\n### Collision Resolution\n| Strategy | How It Works |\n|----------|-------------|\n| **Chaining** | Each bucket stores a linked list of entries |\n| **Open Addressing** | Probe for the next available slot |\n| **Linear Probing** | Check the next sequential slot |\n| **Quadratic Probing** | Check slots at 1², 2², 3²… |\n| **Double Hashing** | Use a second hash function for probe step |\n\n### Load Factor\nThe **load factor** (α) = number of entries / number of buckets. When α gets too high, performance degrades::\n- Chaining: Average chain length becomes α\n- Open addressing: Performance deteriorates rapidly near α = 1\n- Solution: **Rehash** — create a larger table and re-insert all entries.\n\n### Real-World Applications\n- Dictionaries/Maps in programming languages (Python dict, JS Object).\n- Database indexing.\n- Caches (web browser cache, CDN cache).\n- Symbol tables in compilers.\n- Counting frequency of elements.\n\n### Complexity Summary\n| Operation | Average | Worst |\n|-----------|---------|-------|\n| Insert | O(1) | O(n) |\n| Search | O(1) | O(n) |\n| Delete | O(1) | O(n) |`);
+  }, [setComplexity, setPseudocode, setTheory]);
 
   const wait = useCallback(async () => { if (stepMode) await waitForStep(); else await sleep(speed); }, [speed, stepMode, waitForStep]);
 

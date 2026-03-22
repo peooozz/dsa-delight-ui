@@ -4,7 +4,7 @@ import { sleep, randInt } from '@/lib/drawUtils';
 import { Plus, Trash2, Search, ArrowUpDown, Shuffle, RotateCcw } from 'lucide-react';
 
 export default function ArrayModule() {
-  const { speed, addLog, setComplexity, setPseudocode, stepMode, waitForStep } = useApp();
+  const { speed, addLog, setComplexity, setPseudocode, setTheory, stepMode, waitForStep } = useApp();
   const [arr, setArr] = useState([38, 27, 43, 3, 9, 82, 10]);
   const [hl, setHl] = useState<Record<number, string>>({});
   const [val, setVal] = useState('');
@@ -14,7 +14,8 @@ export default function ArrayModule() {
   useEffect(() => {
     setComplexity([['Access','O(1)','O(1)'],['Search','O(n)','O(1)'],['Insert','O(n)','O(n)'],['Delete','O(n)','O(n)'],['Sort','O(n log n)','O(log n)']]);
     setPseudocode(`// Insert at index\nfor i = n downto idx+1:\n  arr[i] = arr[i-1] ← shift right\narr[idx] = value\n\n// Linear Search\nfor i = 0 to n-1:\n  if arr[i] == target: return i\nreturn -1`);
-  }, [setComplexity, setPseudocode]);
+    setTheory(`## Array — Contiguous Data Structure\n\nAn **Array** is the most fundamental data structure in computer science. It stores elements in **contiguous memory locations**, allowing direct access to any element using its index.\n\n### How It Works\nWhen you create an array of size N, the system allocates N consecutive memory blocks. Because the starting address and element size are known, accessing element at index i takes constant time: address = base + (i × size).\n\n### Core Operations\n- **Access by Index**: O(1) — Direct address calculation makes this instant.\n- **Search**: O(n) — Must check each element sequentially (linear search). O(log n) if sorted (binary search).\n- **Insertion**: O(n) — Elements after the insertion point must be shifted right.\n- **Deletion**: O(n) — Elements after the deleted position must be shifted left.\n\n### Advantages\n- Fastest random access of any data structure.\n- Cache-friendly due to spatial locality.\n- Simple and efficient memory usage (no extra pointers).\n\n### Disadvantages\n- Fixed size (in static arrays).\n- Insertions/deletions are expensive due to shifting.\n- Wasted memory if the array is not fully utilized.\n\n### Real-World Applications\n- Storing pixel data in images.\n- Implementing other structures (stacks, queues, heaps).\n- Lookup tables and caches.\n- Matrices for scientific computing.\n\n### Complexity Summary\n| Operation | Time | Space |\n|-----------|------|-------|\n| Access | O(1) | O(1) |\n| Search | O(n) | O(1) |\n| Insert | O(n) | O(n) |\n| Delete | O(n) | O(n) |\n| Sort | O(n log n) | O(log n) |`);
+  }, [setComplexity, setPseudocode, setTheory]);
 
   const wait = useCallback(async () => { if (stepMode) await waitForStep(); else await sleep(speed); }, [speed, stepMode, waitForStep]);
 
@@ -90,14 +91,21 @@ export default function ArrayModule() {
         </div>
       </div>
       <div className="flex-1 flex items-end justify-center gap-2 p-6 rounded-2xl bg-surface-lowest/50 border border-border-faint overflow-hidden">
-        {arr.map((v, i) => (
-          <div key={`${i}-${v}`} className="flex flex-col items-center gap-1.5 anim-pop-in" style={{ animationDelay: `${i * 30}ms` }}>
-            <div className={`viz-bar w-10 rounded-t-lg transition-all ${barColor(hl[i])}`} style={{ height: `${Math.max(v * 2.5, 20)}px` }}>
+        {arr.map((v, i) => {
+          const memAddr = "0x" + (0x1000 + i * 4).toString(16).toUpperCase().padStart(4, '0');
+          return (
+          <div key={`${i}-${v}`} className="flex flex-col items-center gap-1.5 anim-pop-in group" style={{ animationDelay: `${i * 30}ms` }}>
+            <div className={`viz-bar w-10 rounded-t-lg transition-all relative ${barColor(hl[i])}`} style={{ height: `${Math.max(v * 2.5, 20)}px` }}>
               <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[11px] font-mono text-text-light font-semibold">{v}</span>
             </div>
-            <span className="text-[10px] text-text-ghost font-mono">{i}</span>
+            <div className="flex flex-col items-center gap-0.5 mt-1">
+              <span className="text-[10px] text-text-ghost font-mono">[{i}]</span>
+              <span className="text-[8px] font-mono text-text-ghost tracking-wider opacity-60 group-hover:opacity-100 transition-opacity bg-black/20 px-1.5 py-0.5 rounded">
+                {memAddr}
+              </span>
+            </div>
           </div>
-        ))}
+        )})}
         {!arr.length && <span className="text-text-ghost text-sm font-display">Empty</span>}
       </div>
     </div>

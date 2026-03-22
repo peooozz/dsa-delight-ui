@@ -4,7 +4,7 @@ import { sleep, randInt } from '@/lib/drawUtils';
 import { Plus, Minus, ToggleLeft, ToggleRight, Shuffle, RotateCcw } from 'lucide-react';
 
 export default function HeapModule() {
-  const { speed, addLog, setComplexity, setPseudocode, stepMode, waitForStep } = useApp();
+  const { speed, addLog, setComplexity, setPseudocode, setTheory, stepMode, waitForStep } = useApp();
   const [heap, setHeap] = useState([10, 20, 30, 25, 35, 40, 50]);
   const [isMin, setIsMin] = useState(true);
   const [active, setActive] = useState(new Set<number>());
@@ -14,7 +14,8 @@ export default function HeapModule() {
   useEffect(() => {
     setComplexity([['Insert','O(log n)','O(1)'],['Extract','O(log n)','O(1)'],['Peek','O(1)','O(1)']]);
     setPseudocode(`BUBBLE-UP(i):\n  while i > 0:\n    parent = (i-1)/2\n    if heap[i] < heap[parent]:\n      swap; i = parent\n\nBUBBLE-DOWN(i):\n  while child exists:\n    smallest = smaller_child\n    if ok: done\n    swap; i = smallest`);
-  }, [setComplexity, setPseudocode]);
+    setTheory(`## Heap — Priority Queue Structure\n\nA **Heap** is a specialized binary tree that satisfies the **heap property**: in a min-heap, each parent is smaller than its children; in a max-heap, each parent is larger.\n\n### Heap Property\n- **Min-Heap**: parent ≤ children → root is the minimum element.\n- **Max-Heap**: parent ≥ children → root is the maximum element.\n\n### Key Properties\n- A heap is always a **complete binary tree** (every level is full except possibly the last, which is filled left-to-right).\n- Can be efficiently represented as an **array**, where for node at index i:\n  - Parent: floor((i-1)/2)\n  - Left child: 2i + 1\n  - Right child: 2i + 2\n\n### Core Operations\n- **Insert (Bubble Up)**: Add at the end, then swap upward until heap property is restored. O(log n).\n- **Extract (Bubble Down)**: Remove root, move last element to root, then swap downward. O(log n).\n- **Peek**: Return root element. O(1).\n- **Heapify**: Build a heap from an unsorted array. O(n).\n\n### Real-World Applications\n- **Priority Queues**: Task scheduling, event-driven simulation.\n- **Heap Sort**: An in-place O(n log n) sorting algorithm.\n- **Dijkstra's Algorithm**: Uses a min-heap to find shortest paths.\n- **Median Finding**: Use two heaps (max-heap for lower half, min-heap for upper half).\n- **K-th Largest/Smallest**: Maintain a heap of size K.\n\n### Complexity Summary\n| Operation | Time | Space |\n|-----------|------|-------|\n| Insert | O(log n) | O(1) |\n| Extract | O(log n) | O(1) |\n| Peek | O(1) | O(1) |\n| Heapify | O(n) | O(1) |`);
+  }, [setComplexity, setPseudocode, setTheory]);
 
   const wait = useCallback(async () => { if (stepMode) await waitForStep(); else await sleep(speed); }, [speed, stepMode, waitForStep]);
   const cmp = (a: number, b: number) => isMin ? a < b : a > b;
@@ -104,6 +105,9 @@ export default function HeapModule() {
                 {a && <circle cx={x} cy={y} r="26" fill="rgba(108,140,255,0.06)" />}
                 <circle cx={x} cy={y} r="20" fill={a ? 'rgba(108,140,255,0.1)' : 'rgba(255,255,255,0.02)'} stroke={a ? 'rgba(108,140,255,0.4)' : 'rgba(255,255,255,0.06)'} strokeWidth="1.5" />
                 <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fill={a ? '#6C8CFF' : '#e2e8f0'} fontSize="12" fontFamily="var(--font-mono)" fontWeight="600">{v}</text>
+                <text x={x} y={y + 28} textAnchor="middle" fill="currentColor" style={{ opacity: 0.6 }} className="text-[8px] font-mono text-text-ghost">
+                  {`0x${(0x1000 + i * 4).toString(16).toUpperCase().padStart(4, '0')}`}
+                </text>
               </g>
             );
           })}

@@ -23,7 +23,7 @@ function flat(n: TN | null, x: number, y: number, dx: number, o: FlatItem[]) {
 }
 
 export default function BinaryTreeModule() {
-  const { speed, addLog, setComplexity, setPseudocode, stepMode, waitForStep } = useApp();
+  const { speed, addLog, setComplexity, setPseudocode, setTheory, stepMode, waitForStep } = useApp();
   const [root, setRoot] = useState<TN>(() => dflt());
   const [active, setActive] = useState(new Set<number>());
   const [val, setVal] = useState('');
@@ -32,7 +32,8 @@ export default function BinaryTreeModule() {
   useEffect(() => {
     setComplexity([['Insert','O(log n)','O(log n)'],['Delete','O(log n)','O(log n)'],['Traversal','O(n)','O(n)']]);
     setPseudocode(`IN-ORDER(node):\n  IN-ORDER(left)\n  visit(node)\n  IN-ORDER(right)\n\nPRE-ORDER: visit → left → right\nPOST-ORDER: left → right → visit`);
-  }, [setComplexity, setPseudocode]);
+    setTheory(`## Binary Tree — Hierarchical Data Structure\n\nA **Binary Tree** is a hierarchical data structure where each node has at most **two children**, referred to as the left child and the right child.\n\n### Key Terminology\n- **Root**: The topmost node of the tree.\n- **Leaf**: A node with no children.\n- **Height**: The longest path from root to a leaf.\n- **Depth**: The distance from the root to a given node.\n- **Subtree**: A node and all its descendants.\n\n### Types of Binary Trees\n| Type | Property |\n|------|----------|\n| **Full** | Every node has 0 or 2 children |\n| **Complete** | All levels filled except possibly the last |\n| **Perfect** | All internal nodes have 2 children, all leaves at same level |\n| **Balanced** | Height is O(log n) |\n| **Degenerate** | Each node has only one child (like a linked list) |\n\n### Traversals\n- **In-Order (LNR)**: Left → Node → Right. Gives sorted order for BSTs.\n- **Pre-Order (NLR)**: Node → Left → Right. Useful for serialization.\n- **Post-Order (LRN)**: Left → Right → Node. Useful for deletion.\n- **Level-Order (BFS)**: Visit nodes level by level using a queue.\n\n### Real-World Applications\n- File system directory structures.\n- Expression trees in compilers.\n- Decision trees in machine learning.\n- DOM tree in web browsers.\n- Huffman coding for data compression.\n\n### Complexity Summary\n| Operation | Time | Space |\n|-----------|------|-------|\n| Insert | O(log n) | O(log n) |\n| Delete | O(log n) | O(log n) |\n| Traversal | O(n) | O(n) |`);
+  }, [setComplexity, setPseudocode, setTheory]);
 
   const wait = useCallback(async () => { if (stepMode) await waitForStep(); else await sleep(speed); }, [speed, stepMode, waitForStep]);
 
@@ -75,6 +76,9 @@ export default function BinaryTreeModule() {
                 {a && <circle cx={n.x} cy={n.y} r="26" fill="rgba(108,140,255,0.06)" />}
                 <circle cx={n.x} cy={n.y} r="20" fill={a ? 'rgba(108,140,255,0.1)' : 'rgba(255,255,255,0.02)'} stroke={a ? 'rgba(108,140,255,0.4)' : 'rgba(255,255,255,0.06)'} strokeWidth="1.5" />
                 <text x={n.x} y={n.y} textAnchor="middle" dominantBaseline="central" fill={a ? '#6C8CFF' : '#e2e8f0'} fontSize="12" fontFamily="var(--font-mono)" fontWeight="600">{n.v}</text>
+                <text x={n.x} y={n.y + 28} textAnchor="middle" fill="currentColor" style={{ opacity: 0.6 }} className="text-[8px] font-mono text-text-ghost">
+                  {`0x${(((typeof n.v === 'number' ? n.v : 1) * 99991) % 0xFFFF).toString(16).toUpperCase().padStart(4, '0')}`}
+                </text>
               </g>
             );
           })}

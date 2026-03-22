@@ -7,7 +7,7 @@ export default function Index() {
     <AppProvider>
       <div className="flex h-screen w-full bg-background overflow-hidden">
         <DSASidebar />
-        <div className="flex-1 ml-0 md:ml-64 transition-all duration-300">
+        <div className="flex-1 ml-0 md:ml-64 transition-all duration-300 h-screen min-h-0 flex flex-col">
           <MainContent />
         </div>
       </div>

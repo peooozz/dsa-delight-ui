@@ -4,7 +4,7 @@ import { sleep, randInt } from '@/lib/drawUtils';
 import { ArrowUpFromLine, ArrowDownToLine, Eye, Shuffle, RotateCcw } from 'lucide-react';
 
 export default function StackModule() {
-  const { speed, addLog, setComplexity, setPseudocode, stepMode, waitForStep } = useApp();
+  const { speed, addLog, setComplexity, setPseudocode, setTheory, stepMode, waitForStep } = useApp();
   const [stack, setStack] = useState([12, 45, 7, 33]);
   const [hl, setHl] = useState<Record<number, string>>({});
   const [val, setVal] = useState('');
@@ -13,7 +13,8 @@ export default function StackModule() {
   useEffect(() => {
     setComplexity([['Push','O(1)','O(1)'],['Pop','O(1)','O(1)'],['Peek','O(1)','O(1)'],['Search','O(n)','O(1)']]);
     setPseudocode(`PUSH(val):\n  top++; stack[top] = val\n\nPOP():\n  val = stack[top]; top--\n  return val\n\nPEEK(): return stack[top]`);
-  }, [setComplexity, setPseudocode]);
+    setTheory(`## Stack — LIFO Data Structure\n\nA **Stack** is a linear data structure that follows the **Last In, First Out (LIFO)** principle. The most recently added element is the first to be removed — like a stack of plates.\n\n### Core Operations\n- **Push**: Add an element to the top. Time: O(1).\n- **Pop**: Remove the top element. Time: O(1).\n- **Peek / Top**: View the top element without removing it. Time: O(1).\n\n### How It Works\nA stack maintains a pointer (or index) called **top** that tracks the topmost element. Push increments top and places the element; pop reads and decrements top.\n\n### Real-World Applications\n- **Function Call Stack**: Every program uses a stack to manage function calls and local variables.\n- **Undo/Redo**: Text editors push each action onto a stack to support undo.\n- **Expression Evaluation**: Compilers use stacks to evaluate postfix expressions and check balanced parentheses.\n- **Backtracking**: DFS in graphs, maze solving, and puzzle solvers use stacks.\n- **Browser History**: The back button pops from a navigation stack.\n\n### Stack Overflow & Underflow\n- **Overflow**: Pushing to a full stack (fixed-size implementation).\n- **Underflow**: Popping from an empty stack.\n\n### Implementations\n| Method | Push | Pop | Notes |\n|--------|------|-----|-------|\n| Array-based | O(1) amortized | O(1) | May need resizing |\n| Linked List | O(1) | O(1) | No size limit |\n\n### Complexity Summary\n| Operation | Time | Space |\n|-----------|------|-------|\n| Push | O(1) | O(1) |\n| Pop | O(1) | O(1) |\n| Peek | O(1) | O(1) |\n| Search | O(n) | O(1) |`);
+  }, [setComplexity, setPseudocode, setTheory]);
 
   const wait = useCallback(async () => { if (stepMode) await waitForStep(); else await sleep(speed); }, [speed, stepMode, waitForStep]);
 

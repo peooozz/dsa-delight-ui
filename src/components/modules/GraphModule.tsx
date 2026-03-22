@@ -14,7 +14,7 @@ const INIT = (): GraphData => ({
 });
 
 export default function GraphModule() {
-  const { speed, addLog, setComplexity, setPseudocode, stepMode, waitForStep } = useApp();
+  const { speed, addLog, setComplexity, setPseudocode, setTheory, stepMode, waitForStep } = useApp();
   const [graph, setGraph] = useState<GraphData>(INIT);
   const [visited, setVisited] = useState(new Set<string>());
   const [activeEdges, setActiveEdges] = useState(new Set<string>());
@@ -27,7 +27,8 @@ export default function GraphModule() {
   useEffect(() => {
     setComplexity([['BFS','O(V+E)','O(V)'],['DFS','O(V+E)','O(V)'],['Dijkstra','O((V+E)logV)','O(V)']]);
     setPseudocode(`BFS(start):\n  queue = [start]; visited(start)\n  while queue:\n    node = dequeue()\n    for neighbor: visit & enqueue\n\nDFS(start):\n  stack = [start]; visited(start)\n  while stack:\n    node = pop()\n    for neighbor: visit & push`);
-  }, [setComplexity, setPseudocode]);
+    setTheory(`## Graph — Network Data Structure\n\nA **Graph** is a non-linear data structure consisting of **vertices (nodes)** connected by **edges**. Graphs model relationships between objects and are one of the most versatile data structures.\n\n### Key Terminology\n- **Vertex/Node**: A fundamental unit of a graph.\n- **Edge**: A connection between two vertices.\n- **Weighted Graph**: Edges have associated costs/distances.\n- **Directed Graph**: Edges have a direction (one-way).\n- **Undirected Graph**: Edges are bidirectional.\n- **Degree**: Number of edges connected to a vertex.\n\n### Graph Representations\n| Representation | Space | Edge Lookup | Notes |\n|---------------|-------|-------------|-------|\n| Adjacency Matrix | O(V²) | O(1) | Best for dense graphs |\n| Adjacency List | O(V+E) | O(degree) | Best for sparse graphs |\n| Edge List | O(E) | O(E) | Simple but slow |\n\n### Traversal Algorithms\n- **BFS (Breadth-First Search)**: Explores all neighbors at current depth before going deeper. Uses a queue. Finds shortest path in unweighted graphs.\n- **DFS (Depth-First Search)**: Explores as far as possible along a branch before backtracking. Uses a stack. Useful for cycle detection and topological sort.\n\n### Shortest Path Algorithms\n- **Dijkstra**: Finds shortest paths from a source to all vertices in weighted graphs (non-negative weights).\n- **Bellman-Ford**: Handles negative weights. Slower but more general.\n- **Floyd-Warshall**: All-pairs shortest paths in O(V³).\n\n### Real-World Applications\n- Social networks (friendship graphs).\n- Google Maps (road network, shortest routes).\n- Internet routing (network topology).\n- Dependency resolution (package managers).\n- Recommendation systems.\n\n### Complexity Summary\n| Algorithm | Time | Space |\n|-----------|------|-------|\n| BFS | O(V+E) | O(V) |\n| DFS | O(V+E) | O(V) |\n| Dijkstra | O((V+E) log V) | O(V) |`);
+  }, [setComplexity, setPseudocode, setTheory]);
 
   const wait = useCallback(async () => { if (stepMode) await waitForStep(); else await sleep(speed); }, [speed, stepMode, waitForStep]);
 
@@ -123,6 +124,9 @@ export default function GraphModule() {
                 {c && <circle cx={x} cy={y} r="32" fill="rgba(108,140,255,0.06)" />}
                 <circle cx={x} cy={y} r="24" fill={fill} stroke={stroke} strokeWidth="1.5" />
                 <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fill={text} fontSize="14" fontFamily="var(--font-display)" fontWeight="600">{id}</text>
+                <text x={x} y={y + 34} textAnchor="middle" fill="currentColor" style={{ opacity: 0.6 }} className="text-[8px] font-mono text-text-ghost">
+                  {`0x${(((id.charCodeAt(0) || 1) * 99991) % 0xFFFF).toString(16).toUpperCase().padStart(4, '0')}`}
+                </text>
               </g>
             );
           })}

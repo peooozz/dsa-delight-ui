@@ -37,6 +37,10 @@ function spath(r: BN | null, v: number) {
 }
 
 function height(n: BN | null): number { if (!n) return 0; return 1 + Math.max(height(n.l), height(n.r)); }
+function inorder(n: BN | null, a: number[] = []): number[] { if (n) { inorder(n.l, a); a.push(n.v); inorder(n.r, a); } return a; }
+function preorder(n: BN | null, a: number[] = []): number[] { if (n) { a.push(n.v); preorder(n.l, a); preorder(n.r, a); } return a; }
+function postorder(n: BN | null, a: number[] = []): number[] { if (n) { postorder(n.l, a); postorder(n.r, a); a.push(n.v); } return a; }
+function lvlorder(n: BN | null): number[] { if (!n) return []; const r: number[] = [], q: BN[] = [n]; while (q.length) { const x = q.shift()!; r.push(x.v); if (x.l) q.push(x.l); if (x.r) q.push(x.r); } return r; }
 
 interface FlatItem { v?: number; x?: number; y?: number; e?: boolean; x1?: number; y1?: number; x2?: number; y2?: number; }
 function flat(n: BN | null, x: number, y: number, dx: number, o: FlatItem[]) {
@@ -47,7 +51,7 @@ function flat(n: BN | null, x: number, y: number, dx: number, o: FlatItem[]) {
 }
 
 export default function BSTModule() {
-  const { speed, addLog, setComplexity, setPseudocode, stepMode, waitForStep } = useApp();
+  const { speed, addLog, setComplexity, setPseudocode, setTheory, stepMode, waitForStep } = useApp();
   const [root, setRoot] = useState<BN>(() => dflt());
   const [path, setPath] = useState(new Set<number>());
   const [found, setFound] = useState<number | null>(null);
@@ -57,7 +61,8 @@ export default function BSTModule() {
   useEffect(() => {
     setComplexity([['Search','O(log n)','O(1)'],['Insert','O(log n)','O(1)'],['Delete','O(log n)','O(1)']]);
     setPseudocode(`SEARCH(node, val):\n  if node == null: NOT FOUND\n  if val == node.val: FOUND!\n  if val < node.val: go LEFT\n  else: go RIGHT\n\n→ Each step halves the tree = O(log n)`);
-  }, [setComplexity, setPseudocode]);
+    setTheory(`## Binary Search Tree (BST)\n\nA **Binary Search Tree** is a binary tree with a special ordering property: for every node, all values in the **left subtree are smaller** and all values in the **right subtree are larger**.\n\n### The BST Property\nFor any node with value V:\n- All nodes in the left subtree have values < V\n- All nodes in the right subtree have values > V\n- Both subtrees are also BSTs\n\n### Why BSTs Are Efficient\nThe ordering property allows us to eliminate half of the remaining tree at each step during search — similar to binary search on a sorted array, but in a tree structure.\n\n### Core Operations\n- **Search**: Start at root, go left if target < node, right if target > node. O(log n) average.\n- **Insert**: Search for the correct position, then add the new node as a leaf. O(log n) average.\n- **Delete**: Three cases — leaf node (just remove), one child (bypass), two children (replace with in-order successor).\n\n### Balanced vs Unbalanced\n| Tree Type | Search Time | Height |\n|-----------|-------------|--------|\n| Balanced BST | O(log n) | O(log n) |\n| Skewed BST | O(n) | O(n) |\n\n### Self-Balancing BSTs\n- **AVL Tree**: Maintains height balance factor ≤ 1 via rotations.\n- **Red-Black Tree**: Uses color properties to ensure approximate balance.\n- **Splay Tree**: Moves recently accessed nodes to root.\n\n### Real-World Applications\n- Database indexing (B-Trees are generalized BSTs).\n- Auto-complete and spell checkers (Trie is a related structure).\n- Priority scheduling systems.\n- File system organization.\n\n### Complexity Summary\n| Operation | Average | Worst |\n|-----------|---------|-------|\n| Search | O(log n) | O(n) |\n| Insert | O(log n) | O(n) |\n| Delete | O(log n) | O(n) |`);
+  }, [setComplexity, setPseudocode, setTheory]);
 
   const wait = useCallback(async () => { if (stepMode) await waitForStep(); else await sleep(speed); }, [speed, stepMode, waitForStep]);
 
@@ -85,6 +90,12 @@ export default function BSTModule() {
     await wait(); setPath(new Set()); setFound(null); setBusy(false); setVal('');
   };
 
+  const trav = async (name: string, fn: (n: BN | null) => number[]) => {
+    setBusy(true); const o = fn(root); addLog(`${name}: [${o.join(', ')}]`);
+    for (const v of o) { setFound(v); await wait(); }
+    setFound(null); addLog(`${name} done`, 'success'); setBusy(false);
+  };
+
   const h = height(root);
   const items: FlatItem[] = []; flat(root, 350, 30, 140, items);
 
@@ -95,6 +106,10 @@ export default function BSTModule() {
         <button onClick={doIns} disabled={busy} className="pill-btn pill-primary text-[12px] py-2 px-3"><Plus className="w-3.5 h-3.5" />Insert</button>
         <button onClick={doDel} disabled={busy} className="pill-btn pill-red text-[12px] py-2 px-3"><Trash2 className="w-3.5 h-3.5" />Delete</button>
         <button onClick={doSearch} disabled={busy} className="pill-btn pill-teal text-[12px] py-2 px-3"><Search className="w-3.5 h-3.5" />Search</button>
+        <button onClick={() => trav('In-Order', inorder)} disabled={busy} className="pill-btn pill-secondary text-[11px] py-1.5 px-2.5">In-Order</button>
+        <button onClick={() => trav('Pre-Order', preorder)} disabled={busy} className="pill-btn pill-secondary text-[11px] py-1.5 px-2.5">Pre-Order</button>
+        <button onClick={() => trav('Post-Order', postorder)} disabled={busy} className="pill-btn pill-secondary text-[11px] py-1.5 px-2.5">Post-Order</button>
+        <button onClick={() => trav('Level-Order', lvlorder)} disabled={busy} className="pill-btn pill-secondary text-[11px] py-1.5 px-2.5">Level</button>
         <span className="text-[11px] text-text-ghost font-mono ml-2">Height: {h}</span>
         <div className="ml-auto flex gap-1.5">
           <button onClick={() => { let r: BN | null = null; Array.from({ length: randInt(6, 10) }, () => randInt(1, 99)).forEach(v => r = ins(r, v)); setRoot(r!); setPath(new Set()); setFound(null); addLog('Randomized'); }} disabled={busy} className="pill-btn pill-ghost text-[11px] py-1.5 px-2.5"><Shuffle className="w-3 h-3" />Random</button>
@@ -116,6 +131,9 @@ export default function BSTModule() {
                 {(ip || isF) && <circle cx={n.x} cy={n.y} r="26" fill={isF ? 'rgba(74,222,128,0.05)' : 'rgba(251,146,60,0.04)'} />}
                 <circle cx={n.x} cy={n.y} r="20" fill={fill} stroke={stroke} strokeWidth="1.5" />
                 <text x={n.x} y={n.y} textAnchor="middle" dominantBaseline="central" fill={text} fontSize="12" fontFamily="var(--font-mono)" fontWeight="600">{n.v}</text>
+                <text x={n.x} y={n.y + 28} textAnchor="middle" fill="currentColor" style={{ opacity: 0.6 }} className="text-[8px] font-mono text-text-ghost">
+                  {`0x${(((typeof n.v === 'number' ? n.v : 1) * 99991) % 0xFFFF).toString(16).toUpperCase().padStart(4, '0')}`}
+                </text>
               </g>
             );
           })}

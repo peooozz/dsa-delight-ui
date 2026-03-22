@@ -6,7 +6,7 @@ import { Play, Shuffle, RotateCcw } from 'lucide-react';
 const ALGOS = ['Bubble', 'Insertion', 'Merge', 'Quick'] as const;
 
 export default function SortingModule() {
-  const { speed, addLog, setComplexity, setPseudocode, stepMode, waitForStep } = useApp();
+  const { speed, addLog, setComplexity, setPseudocode, setTheory, stepMode, waitForStep } = useApp();
   const [arr, setArr] = useState(() => Array.from({ length: 24 }, () => randInt(5, 95)));
   const [hl, setHl] = useState<Record<number, string>>({});
   const [algo, setAlgo] = useState<string>('Bubble');
@@ -27,7 +27,8 @@ export default function SortingModule() {
       Quick: `QUICK-SORT(lo, hi):\n  if lo < hi:\n    pi = PARTITION(lo, hi)\n    SORT(lo, pi-1)\n    SORT(pi+1, hi)`,
     };
     setPseudocode(ps[algo]);
-  }, [algo, setComplexity, setPseudocode]);
+    setTheory(`## Sorting Algorithms — Ordering Data\n\nSorting is the process of arranging data in a particular order (ascending/descending). It's one of the most studied topics in computer science because efficient sorting enables efficient searching.\n\n### Comparison-Based Sorting\n| Algorithm | Best | Average | Worst | Space | Stable |\n|-----------|------|---------|-------|-------|--------|\n| Bubble Sort | O(n) | O(n²) | O(n²) | O(1) | Yes |\n| Insertion Sort | O(n) | O(n²) | O(n²) | O(1) | Yes |\n| Merge Sort | O(n log n) | O(n log n) | O(n log n) | O(n) | Yes |\n| Quick Sort | O(n log n) | O(n log n) | O(n²) | O(log n) | No |\n\n### Algorithm Descriptions\n- **Bubble Sort**: Repeatedly swap adjacent elements if they're in the wrong order. Simple but slow for large datasets.\n- **Insertion Sort**: Build the sorted array one element at a time. Efficient for small or nearly-sorted data.\n- **Merge Sort**: Divide the array in half, sort each half recursively, then merge. Guaranteed O(n log n) but requires extra space.\n- **Quick Sort**: Pick a pivot, partition around it, sort partitions recursively. Fastest in practice for most data.\n\n### Stability\nA sorting algorithm is **stable** if equal elements maintain their original relative order. This matters when sorting by multiple criteria.\n\n### When to Use What\n- **Small arrays (< 50)**: Insertion Sort — low overhead.\n- **General purpose**: Quick Sort — fastest on average.\n- **Guaranteed performance**: Merge Sort — always O(n log n).\n- **Nearly sorted data**: Insertion Sort — O(n) best case.\n- **Memory constrained**: Heap Sort — O(1) extra space.\n\n### Lower Bound\nNo comparison-based sorting algorithm can do better than **O(n log n)** in the worst case. This is proven by the decision tree model.\n\n### Non-Comparison Sorts\n- **Counting Sort**: O(n + k) for integer keys in range [0, k].\n- **Radix Sort**: O(d × (n + k)) where d = number of digits.\n- **Bucket Sort**: O(n + k) average for uniformly distributed data.`);
+  }, [algo, setComplexity, setPseudocode, setTheory]);
 
   const wait = useCallback(async () => { if (stepMode) await waitForStep(); else await sleep(speed); }, [speed, stepMode, waitForStep]);
 
@@ -150,12 +151,49 @@ export default function SortingModule() {
         <span className="px-2 py-0.5 rounded bg-cyan/10 text-cyan">Sorted</span>
         <span className="px-2 py-0.5 rounded bg-purple/10 text-purple">Pivot</span>
       </div>
-      <div className="flex-1 flex items-end justify-center gap-[2px] p-4 rounded-2xl bg-surface-lowest/50 border border-border-faint overflow-hidden">
-        {arr.map((v, i) => (
-          <div key={`${i}-${v}-${arr.length}`}
-            className={`viz-bar flex-1 max-w-3 ${bc(hl[i])}`}
-            style={{ height: `${(v / max) * 100}%` }} />
-        ))}
+      <div className="flex-1 flex items-end justify-center gap-1.5 p-4 rounded-2xl bg-surface-lowest/50 border border-border-faint overflow-hidden">
+        {arr.map((v, i) => {
+          const isSorted = hl[i] === 'sorted';
+          const isCompare = hl[i] === 'compare';
+          const isSwap = hl[i] === 'swap';
+          const isPivot = hl[i] === 'pivot';
+          
+          let bgColor = `hsl(${(v / max) * 280}, 80%, 65%)`; // Base rainbow gradient
+          if (isSorted) bgColor = '#00F0FF'; // cyan
+          if (isCompare) bgColor = '#FFE600'; // yellow
+          if (isSwap) bgColor = '#FF3366'; // red
+          if (isPivot) bgColor = '#B026FF'; // purple
+
+          return (
+            <div key={`${i}-${v}-${arr.length}`} className="h-full flex-1 flex flex-col justify-end items-center gap-1 max-w-[48px] min-w-[12px] group relative">
+              {/* Value floating above bar */}
+              <span className={`text-[10px] sm:text-xs font-mono font-bold transition-all duration-300
+                ${isSorted ? 'text-cyan scale-110 drop-shadow-[0_0_8px_rgba(0,240,255,0.6)]' : 
+                  isCompare ? 'text-yellow scale-110 drop-shadow-[0_0_8px_rgba(255,230,0,0.6)]' : 
+                  isSwap ? 'text-red scale-110 drop-shadow-[0_0_8px_rgba(255,51,102,0.6)]' : 
+                  'text-text-light group-hover:text-text-white'}`}>
+                {v}
+              </span>
+              
+              {/* The Graph Bar */}
+              <div 
+                className={`w-full rounded-t flex flex-col justify-end overflow-hidden transition-all duration-300
+                  ${isCompare || isSwap || isPivot ? 'shadow-[0_0_15px_currentColor] z-10' : 'opacity-80 hover:opacity-100'}`}
+                style={{ 
+                  height: `${Math.max(5, (v / max) * 100)}%`,
+                  backgroundColor: bgColor,
+                  color: bgColor // For the shadow
+                }}
+              >
+                {/* Subtle gradient overlay to make bar look 3d-ish */}
+                <div className="w-full h-full bg-gradient-to-t from-black/40 to-transparent"></div>
+              </div>
+              <span className="text-[8px] font-mono text-text-ghost tracking-wider opacity-30 group-hover:opacity-100 transition-opacity bg-black/20 px-1 py-0.5 rounded mt-1">
+                {`0x${(0x1000 + i * 4).toString(16).toUpperCase().padStart(4, '0')}`}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

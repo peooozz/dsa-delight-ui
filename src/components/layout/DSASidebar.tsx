@@ -2,19 +2,28 @@ import { useApp } from '@/context/AppContext';
 import {
   LayoutGrid, Link2, Layers, AlignJustify,
   TreeDeciduous, Search, ArrowUpDown,
-  Share2, Hash, BarChart3, Menu, X, Zap
+  Share2, Hash, BarChart3, Menu, X, Zap, Disc3,
+  ArrowLeftRight, CircleDot, ListOrdered, Binary,
+  Network, Repeat
 } from 'lucide-react';
 
 const ICONS: Record<string, React.ElementType> = {
-  array: LayoutGrid, linkedlist: Link2, stack: Layers, queue: AlignJustify,
+  array: LayoutGrid, linkedlist: Link2, doublylinkedlist: Link2, circularlinkedlist: Link2, stack: Layers, queue: AlignJustify,
+  deque: ArrowLeftRight, circularqueue: CircleDot, priorityqueue: ListOrdered,
+  binarysearch: Binary,
   binarytree: TreeDeciduous, bst: Search, heap: ArrowUpDown,
+  trie: Network,
   graph: Share2, hashtable: Hash, sorting: BarChart3,
+  towerofhanoi: Disc3, recursion: Repeat,
 };
 
 const GROUPS = [
-  { label: 'Linear', modules: ['array', 'stack'] },
-  { label: 'Trees', modules: ['binarytree', 'bst', 'heap'] },
+  { label: 'Linear', modules: ['array', 'linkedlist', 'doublylinkedlist', 'circularlinkedlist', 'stack'] },
+  { label: 'Queues', modules: ['queue', 'deque', 'circularqueue', 'priorityqueue'] },
+  { label: 'Searching', modules: ['binarysearch'] },
+  { label: 'Trees', modules: ['binarytree', 'bst', 'heap', 'trie'] },
   { label: 'Advanced', modules: ['graph', 'hashtable', 'sorting'] },
+  { label: 'Algorithms', modules: ['towerofhanoi', 'recursion'] },
 ];
 
 export default function DSASidebar() {
