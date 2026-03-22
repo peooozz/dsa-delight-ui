@@ -1,16 +1,16 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { AppProvider } from '@/context/AppContext';
+import DSASidebar from '@/components/layout/DSASidebar';
+import MainContent from '@/components/layout/MainContent';
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+export default function Index() {
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
-    </div>
+    <AppProvider>
+      <div className="flex h-screen w-full bg-background overflow-hidden">
+        <DSASidebar />
+        <div className="flex-1 ml-0 md:ml-64 transition-all duration-300">
+          <MainContent />
+        </div>
+      </div>
+    </AppProvider>
   );
-};
-
-const Index = PlaceholderIndex;
-
-export default Index;
+}
